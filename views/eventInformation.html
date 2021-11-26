@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/events.html">All Events</a>
+        <a href="/addEvent.html">Add Event</a>
+        <a href="/updateEvent.html">Edit Event</a>
+        <a href="/deleteEvent.html">Delete Event</a>
+        <a href="/eventInformation.html">Event Information</a>   
+        <a href="/addPersonForEvent.html">Add to Event</a>   
+        <a href="/people.html">People</a>
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives</h1>
+            <p>Please enter the event id for an existing event to be queried.</p>
+            <form>
+                <label for="id">Event Id:</label><br>
+                <input type="text" id="id"><br><br>
+
+                <input type="button" class="button-25" onclick="readData();refresh_text();" value="Submit">
+            </form><br><br>
+            <h2>Event Information</h2>
+            <p id="event-data"></p><br>
+            <h2>People Registered for Event</h2>
+            <p id="people-data"></p>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        var eid;
+        var text;
+        var text1;
+
+        function refresh_text(){
+            document.getElementById("id").value = '';
+        }
+       
+       function readData() {
+            eid=document.getElementById("id").value;
+            //send a GET to /posts async
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '/event/' + eid, true); 
+            xhr.send();
+
+            xhr.onload=function(){
+                text = "<table class='content-table'><thead><tr>"
+                text += "<th>" + "Id" + "</th>";
+                text += "<th>" + "Event Name" + "</th>";
+                text += "<th>" + "Location" + "</th>";
+                text += "<th>" + "Date" + "</th>";
+                text += "<th>" + "Details" + "</th>";
+                text += "<th>" + "Max Cap." + "</th>";
+                text += "</tr></thead><tbody>"
+            
+                if (xhr.readyState == 4 && xhr.status == 200 ) {
+                    const myObj = JSON.parse(xhr.responseText);
+
+                    for (let x in myObj) {
+                        text += "<tr><td>" + myObj[x].id + "</td>";
+                        text += "<td>" + myObj[x].Name + "</td>";
+                        text += "<td>" + myObj[x].Location + "</td>";
+                        text += "<td>" + myObj[x].Date + "</td>";
+                        text += "<td>" + myObj[x].Details + "</td>";
+                        text += "<td>" + myObj[x].MaxCapacity + "</td>";
+                        text += "</tr>";
+                    }
+                    text += "</tbody></table>"    
+                    document.getElementById("event-data").innerHTML = text;
+                }else if(xhr.status == 404 )  
+                    alert("Please make sure that all content is filled out properly.");
+                else
+                    alert("Ran into a server error while fetching data.");
+            };
+
+            findPeople();
+        }
+
+        function findPeople(){
+            //send a GET to /posts async
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '/attending_event/' + eid, true); 
+            xhr.send();
+
+            xhr.onload=function(){
+                text1 = "<table class='content-table'><thead><tr>"
+                text1 += "<th>" + "Id" + "</th>";
+                text1 += "<th>" + "Last Name" + "</th>";
+                text1 += "<th>" + "First Name" + "</th>";
+                text1 += "<th>" + "Age" + "</th>";
+                text1 += "<th>" + "Family Size" + "</th>";
+                text1 += "<th>" + "Diet Restrictions" + "</th>";
+                text1 += "</tr></thead><tbody>"
+            
+                if (xhr.readyState == 4 && xhr.status == 200 ) {
+                    const myObj = JSON.parse(xhr.responseText);
+
+                    for (let x in myObj) {
+                        text1 += "<tr><td>" + myObj[x].id + "</td>";
+                        text1 += "<td>" + myObj[x].LastName + "</td>";
+                        text1 += "<td>" + myObj[x].FirstName + "</td>";
+                        text1 += "<td>" + myObj[x].Age + "</td>";
+                        text1 += "<td>" + myObj[x].FamilySize + "</td>";
+                        text1 += "<td>" + myObj[x].DietRestrictions + "</td>";
+                        text1 += "</tr>";
+                    }
+                    text1 += "</tbody></table>"    
+                    document.getElementById("people-data").innerHTML = text1;
+                }else if(xhr.status == 404 )  
+                    alert("Please make sure that all content is filled out properly.");
+                else
+                    alert("Ran into a server error while making the post.");
+            };
+        }
+    </script>
+</html>

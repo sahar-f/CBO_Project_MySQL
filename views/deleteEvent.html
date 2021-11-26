@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/events.html">All Events</a>
+        <a href="/addEvent.html">Add Event</a>
+        <a href="/updateEvent.html">Edit Event</a>
+        <a href="/deleteEvent.html">Delete Event</a>
+        <a href="/eventInformation.html">Event Information</a>
+        <a href="/addPersonForEvent.html">Add to Event</a>   
+        <a href="/people.html">People</a>
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives</h1>
+            <h2>Delete Event</h2>
+            <p>Please enter the event id for an existing event to be deleted.</p>
+            <form>
+                <label for="id">Event Id:</label><br>
+                <input type="text" id="id"><br><br>
+
+                <input type="button" class="button-25" onclick="delete_event();" value="Submit">
+              </form> 
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        /**
+        * Function that refreshes text fields- called everytime the submit button is pressed
+        */
+        function refresh_text(){
+            document.getElementById("id").value = '';
+        }
+
+        function delete_event() {
+            var xhr = new XMLHttpRequest();
+            
+            // listens for any type of response from the PUT request. The response status will be 404 if parameters are not filled out properly.
+            xhr.addEventListener("loadend", () => {
+                if (xhr.status == 404) 
+                    alert("Please make sure that all content is filled out properly.");
+                else if (xhr.status == 200) {
+                    alert("Event Deleted!");
+                } 
+                else
+                    alert("Ran into a server error while updating event.");
+            });
+
+            xhr.open("DELETE", '/deleteEvent/' + document.getElementById("id").value, true); 
+            xhr.send();
+            
+            refresh_text();
+        }
+    </script>
+</html>

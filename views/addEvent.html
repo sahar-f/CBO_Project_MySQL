@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/events.html">All Events</a>
+        <a href="/addEvent.html">Add Event</a>
+        <a href="/updateEvent.html">Edit Event</a>
+        <a href="/deleteEvent.html">Delete Event</a>
+        <a href="/eventInformation.html">Event Information</a>   
+        <a href="/addPersonForEvent.html">Add to Event</a>   
+        <a href="/people.html">People</a>
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives (*Not Required)</h1>
+            <h2>Add Event</h2>
+            <form>
+                <label for="Name">Name:</label><br>
+                <input type="text" id="Name"><br><br>
+
+                <label for="Location">Location:</label><br>
+                <textarea type="text" id="Location"></textarea><br><br>
+                                
+                <label for="Date">Date of Event:</label><br>
+                <input type="text" id="Date"><br><br>
+
+                <label for="Details">Details of Event*:</label><br>
+                <textarea type="text" id="Details"></textarea><br><br>
+
+                <label for="MaxCapacity">Maximum Capacity:</label><br>
+                <input type="text" id="MaxCapacity"><br><br>
+
+                <input type="button" class="button-25" onclick="post();" value="Submit">
+              </form> 
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        /**
+        * Function that refreshes text fields- called everytime the submit button is pressed
+        */
+        function refresh_text(){
+            document.getElementById("Name").value = '';
+            document.getElementById("Location").value = '';
+            document.getElementById("Date").value = '';
+            document.getElementById("Details").value = '';
+            document.getElementById("MaxCapacity").value = '';
+        }
+
+         /**
+        * Function that calls the POST function in index.js using async XMLHttpRequest and
+        * outputs the correct altert, updates fields, and calls the refresh method.
+        */
+        function post() {
+            var xhr = new XMLHttpRequest();
+           
+            // listens for any type of response from the POST request. The response status will be 404 if parameters are not filled out properly. 
+            xhr.addEventListener('loadend', () => {
+                if (xhr.status == 404) 
+                    alert("Please make sure that all content (except details) is filled out properly.");
+                else if (xhr.status == 200) {
+                    alert("Event Made!");
+                } 
+                else
+                    alert("Ran into a server error while adding event.");
+            });  
+            
+            // the body of the POST request
+            var body =  "Name=" + document.getElementById("Name").value + "&" +
+                        "Location="+ document.getElementById("Location").value + "&" +
+                        "Date="+ document.getElementById("Date").value + "&" +
+                        "Details="+ document.getElementById("Details").value + "&" +
+                        "MaxCapacity="+ document.getElementById("MaxCapacity").value;
+
+
+            // send a POST request using XMLHTTPREQUEST
+            xhr.open("POST", '/addEvent', true); 
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(body);
+
+            refresh_text();
+        }
+    </script>
+</html>

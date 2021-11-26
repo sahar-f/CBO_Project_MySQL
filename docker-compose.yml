@@ -1,0 +1,37 @@
+version: "3.8"
+
+services: 
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - 3000:3000
+    volumes: 
+      - .:/app
+      - '/app/node_modules'
+    depends_on: 
+      - mysql_server
+    command: "npx nodemon -L src/index.js"
+    
+  mysql_server:
+    image: mysql:latest # use latest version of mysql
+    container_name: db # add a name for the container
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment: # add default values, see docs for more info.
+      MYSQL_USER: sahar
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: charitydb # create this database on startup
+    volumes:
+      - my-db:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+
+volumes: # add persistent data even if container is removed.
+  my-db: 
+
+    

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/events.html">All Events</a>
+        <a href="/addEvent.html">Add Event</a>
+        <a href="/updateEvent.html">Edit Event</a>
+        <a href="/deleteEvent.html">Delete Event</a>
+        <a href="/eventInformation.html">Event Information</a> 
+        <a href="/addPersonForEvent.html">Add to Event</a>     
+        <a href="/people.html">People</a>
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives</h1>
+            <h2>All Events on System </h2>
+            <p id="data"></p>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        readData();     //displays the page when page refreshes by anyone/thing.
+      
+       /**
+        * Function that calls the GET function in index.js using async XMLHttpRequest and
+        * updates the Past Posts portion of the html every second.
+        */
+        function readData() {
+
+            //send a GET to /posts async
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/events', true); 
+            xhr.send();
+
+            xhr.onload=function(){
+
+                let text = "<table class='content-table'><thead><tr>"
+                text += "<th>" + "Id" + "</th>";
+                text += "<th>" + "Event Name" + "</th>";
+                text += "<th>" + "Location" + "</th>";
+                text += "<th>" + "Date" + "</th>";
+                text += "<th>" + "Details" + "</th>";
+                text += "<th>" + "Max Cap." + "</th>";
+                text += "</tr></thead><tbody>"
+            
+                if (xhr.readyState == 4 && xhr.status == 200 ) {
+                    const myObj = JSON.parse(xhr.responseText);
+
+                    for (let x in myObj) {
+                        text += "<tr><td>" + myObj[x].id + "</td>";
+                        text += "<td>" + myObj[x].Name + "</td>";
+                        text += "<td>" + myObj[x].Location + "</td>";
+                        text += "<td>" + myObj[x].Date + "</td>";
+                        text += "<td>" + myObj[x].Details + "</td>";
+                        text += "<td>" + myObj[x].MaxCapacity + "</td>";
+                        text += "</tr>";
+                    }
+                    text += "</tbody></table>"    
+                    document.getElementById("data").innerHTML = text;
+                }else
+                    alert("Ran into a server error while fetching data.");
+            };
+
+            setTimeout('readData()', 1000);      //refresh posts every second.
+        }
+    </script>
+</html>

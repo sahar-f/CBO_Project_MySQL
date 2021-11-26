@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/people.html">All People</a>
+        <a href="/addPerson.html">Add Person</a>
+        <a href="/updatePerson.html">Edit Person</a>
+        <a href="/deletePerson.html">Delete Person</a> 
+        <a href="/addPersonForEvent.html">Add to Event</a>   
+        <a href="/peopleInformation.html">People Information</a> 
+        <a href="/events.html">Events</a>    
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives</h1>
+            <h2>Add Person (*Not Required)</h2>
+            <form>
+                <label for="LastName">Last Name:</label><br>
+                <input type="text" id="LastName"><br><br>
+
+                <label for="FirstName">First Name:</label><br>
+                <input type="text" id="FirstName"><br><br>
+                                
+                <label for="Age">Age:</label><br>
+                <input type="text" id="Age"><br><br>
+
+                <label for="FamilySize">Family Size:</label><br>
+                <input type="text" id="FamilySize"><br><br>
+
+                <label for="DietRestrictions">Diet Restrictions*:</label><br>
+                <textarea type="text" id="DietRestrictions"></textarea><br><br>
+
+                <input type="button" class="button-25" onclick="post();" value="Submit">
+              </form> 
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        /**
+        * Function that refreshes text fields- called everytime the submit button is pressed
+        */
+        function refresh_text(){
+            document.getElementById("LastName").value = '';
+            document.getElementById("FirstName").value = '';
+            document.getElementById("Age").value = '';
+            document.getElementById("FamilySize").value = '';
+            document.getElementById("DietRestrictions").value = '';
+        }
+
+         /**
+        * Function that calls the POST function in index.js using async XMLHttpRequest and
+        * outputs the correct altert, updates fields, and calls the refresh method.
+        */
+        function post() {
+            var xhr = new XMLHttpRequest();
+            
+            // listens for any type of response from the POST request. The response status will be 404 if parameters are not filled out properly.
+            xhr.addEventListener('loadend', () => {
+                if (xhr.status == 404) 
+                    alert("Please make sure that all content (except diet) is filled out properly.");
+                else if (xhr.status == 200) {
+                    alert("Person Made!");
+                } 
+                else
+                    alert("Ran into a server error while adding person.");
+            });  
+
+            // the body of the POST request
+            var body =  "LastName=" + document.getElementById("LastName").value + "&" +
+                        "FirstName="+ document.getElementById("FirstName").value + "&" +
+                        "Age="+ document.getElementById("Age").value + "&" +
+                        "FamilySize="+ document.getElementById("FamilySize").value + "&" +
+                        "DietRestrictions="+ document.getElementById("DietRestrictions").value;
+
+            // send a POST request using XMLHTTPREQUEST
+            xhr.open("POST", "/addPerson", true); 
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(body);
+                    
+            refresh_text();
+        }
+    </script>
+</html>

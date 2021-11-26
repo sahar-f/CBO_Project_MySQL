@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <head>
+        <title>Food Drives</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+  
+    <div class="topnav">
+        <a class="active" href="/home.html">Home</a>
+        <a href="/events.html">Events</a>   
+        <a href="/people.html">People</a>
+        <a href="/addPersonForEvent.html">Add to Event</a>   
+    </div>
+
+    <body>
+        <div>
+            <h1>Management System for Food Drives</h1>
+            <h2>Add person to an event: </h2>
+            <p>Please add the Event Id and Person Id below:</p><br>
+            <form>
+                <label for="eventId">Event Id:</label><br>
+                <input type="text" id="eventId"><br><br>
+
+                <label for="personId">Person Id:</label><br>
+                <input type="text" id="personId"><br><br>
+                                
+                <input type="button" class="button-25" onclick="checkEventCapacity();refresh_text();" value="Submit">
+              </form> 
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        var eid;
+        var pid;
+        var pexists;
+        /**
+        * Function that refreshes text fields- called everytime the submit button is pressed checkIfMaxCap
+        */
+        function refresh_text(){
+            document.getElementById("eventId").value = '';
+            document.getElementById("personId").value = '';
+        }
+
+        /**
+         * Gets the maximum capacity of the event though event id and passes it to 
+         */
+        function checkEventCapacity(){
+            eid = document.getElementById("eventId").value;
+            pid = document.getElementById("personId").value;
+            //send a GET to /posts async
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '/maxCap/' + eid, true); 
+            xhr.send();
+
+            xhr.onload=function(){
+                if (xhr.readyState == 4 && xhr.status == 200 ) {
+                    const myObj = JSON.parse(xhr.responseText);
+                    checkIfMaxCap(myObj[0].MaxCapacity);
+                }else if(xhr.status == 404 )  
+                    alert("Please make sure that all content is filled out properly.");
+                else if(xhr.status == 500 )  
+                    alert("Event does not exist!");
+                else
+                    alert("Ran into a server error while adding person to event-1.");
+            };
+
+        }
+
+        /*
+        * Checks if event is at max capacity already and alters user, if not, calls post()
+        */
+        function checkIfMaxCap(maxCap){
+            //send a GET to /posts async
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '/attending_event/' + eid, true); 
+            xhr.send();
+
+            xhr.onload=function(){
+                if (xhr.readyState == 4 && xhr.status == 200 ) 
+                {
+                    var text = xhr.responseText;
+                    if(!text || text == ''){
+                        post();
+                    }
+                    else{
+                        const myObj = JSON.parse(text);
+                        var count = 0;
+                        for (let x in myObj) {
+                            count++;
+                        }
+                        if(count >= maxCap){
+                            alert("Event is already full");
+                        }else{
+                            post();
+                        }       
+                    }             
+                }else if(xhr.status == 404 )  
+                    alert("Please make sure that all ids are filled out properly and exist in database.");
+                else
+                    alert("Ran into a server error while adding person to event.-2");
+            };
+        }
+        
+        /**
+         * Register's personId to eventId.
+         */
+        function post() {
+
+            //check if person exists
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", '/people/' + pid, true); 
+            xhr.send();
+
+            xhr.onload=function(){
+                if (xhr.readyState == 4 && xhr.status == 200 ) 
+                {
+                    var text = xhr.responseText;
+                    const myObj = JSON.parse(text);
+                        var count = 0;
+                        for (let x in myObj) {
+                            count++;
+                        }
+                    if(count == 0){
+                        alert("Person does not exist!")
+                    }
+                    else if(count == 1){
+                        var xhr2 = new XMLHttpRequest();
+                
+                        // the body of the POST request
+                        var body =  "eventId=" + eid + "&" +
+                                    "personId="+ pid;
+
+                        // send a POST request using XMLHTTPREQUEST
+                        xhr2.open("POST", '/addPersonForEvent', true); 
+                        xhr2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xhr2.send(body);
+
+                        // listens for any type of response from the POST request. The response status will be 404 if parameters are not filled out properly. 
+                        xhr2.addEventListener('loadend', () => {
+                            if (xhr2.status == 200) 
+                                alert("Person added to Event!");
+                            else if (xhr2.status == 404)
+                                alert("Please make sure that all content is filled out properly-3.");
+                            else
+                                alert("Ran into a server error while adding person to event.-3");
+                        }); 
+                    }             
+                }else if(xhr.status == 404 )  
+                    alert("Please make sure that all ids are filled out properly and exist in database.");
+                else
+                    alert("Ran into a server error while checking if person exists.-4");
+            };
+        }
+     
+    </script>
+</html>
